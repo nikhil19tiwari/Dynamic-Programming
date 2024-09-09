@@ -1,0 +1,845 @@
+q1-> 0/1 knapsack by tabulation
+    
+    
+class Solution {
+    // Function to return max value that can be put in knapsack of capacity W.
+    public static int solve(int W, int wt[], int val[], int n,int t[][]) {
+        // base condition
+        // if (n == 0 || W == 0) {
+        //     return 0;
+        // } 
+        // if(t[n][W] != -1){
+        //     return t[n][W];
+        // }
+        for(int i =0;i<n+1;i++){
+            t[i][0] = 0;
+        }
+        for(int j =0;j<W+1;j++){
+            t[0][j] = 0;
+        }
+        // else if (W >= wt[n - 1]) {
+        //     t[n][W] = Math.max(val[n - 1] + solve(W - wt[n - 1], wt, val, n - 1,t), solve(W, wt, val, n - 1,t));
+        // } else {
+        //     t[n][W] =  solve(W, wt, val, n - 1,t);
+        // }
+       for(int i = 1;i<n+1;i++){
+           for(int j =1;j<W+1;j++){
+                if(j >= wt[i-1]){
+            t[i][j] = Math.max(val[i-1]+t[i-1][j-wt[i-1]],t[i-1][j]);
+        }
+        else{
+            t[i][j] = t[i-1][j];
+        }
+           }
+       }
+        return t[n][W];
+    }
+
+    static int knapSack(int W, int wt[], int val[], int n) {
+        int t[][] = new int[n+1][W+1];
+        for(int  i = 0;i<n+1;i++){
+            for(int j = 0;j<W+1;j++){
+                t[i][j] = -1;
+            }
+        }
+        return solve(W, wt, val, n,t);
+    }
+}
+
+
+q2->equal sum partition
+class Solution {
+    static boolean subsetSum(int N, int sum, int[] arr, boolean[][] t) {
+        // initialize
+        for (int i = 0; i < sum + 1; i++) {
+            t[0][i] = false;
+        }
+        for (int i = 0; i < N + 1; i++) {
+            t[i][0] = true;
+        }
+        for (int i = 1; i < N + 1; i++) {
+            for (int j = 1; j < sum + 1; j++) {
+                if (j >= arr[i - 1]) {
+                    t[i][j] = t[i - 1][j - arr[i - 1]] || t[i - 1][j];
+                } else {
+                    t[i][j] = t[i - 1][j];
+                }
+            }
+        }
+        return t[N][sum];
+    }
+
+    static int equalPartition(int N, int arr[]) {
+        int sum = 0;
+        for (int i = 0; i < N; i++) {
+            sum = sum + arr[i];
+        }
+        if (sum % 2 != 0) {
+            return 0;
+        } else {
+            boolean[][] t = new boolean[N + 1][sum / 2 + 1];
+            return subsetSum(N, sum / 2, arr, t) ? 1 : 0;
+        }
+    }
+}
+
+3-> count of subset sum
+class Solution {
+    public int perfectSum(int arr[], int n, int sum) {
+        int t[][] = new int[n + 1][sum + 1];
+
+        // Initialize the first column
+        t[0][0] = 1;
+
+        int cnt = 1;
+        int mod = (int)1e9 + 7;
+
+        for (int i = 1; i <= n; i++) {
+            for (int j = 0; j <= sum; j++) {
+                if (j >= arr[i - 1]) {
+                    t[i][j] = (t[i - 1][j - arr[i - 1]] + t[i - 1][j]) % mod;
+                } else {
+                    t[i][j] = t[i - 1][j];
+                }
+            }
+
+            if (arr[i - 1] == 0) {
+                cnt = (cnt * 2) % mod;
+                t[i][0] = cnt;
+            }
+        }
+
+        return t[n][sum];
+    }
+}
+
+
+4-> minimum subset sum difference 
+
+
+class Solution {
+    public boolean subSetSum(int arr[], int size, int sum, boolean t[][]) {
+        for (int i = 0; i < sum + 1; i++) {
+            t[0][i] = false;
+        }
+        for (int i = 0; i < size + 1; i++) {
+            t[i][0] = true;
+        }
+        for (int i = 1; i < size + 1; i++) {
+            for (int j = 1; j < sum + 1; j++) {
+                if (j >= arr[i - 1]) {
+                    t[i][j] = t[i - 1][j - arr[i - 1]] || t[i - 1][j];
+                } else {
+                    t[i][j] = t[i - 1][j];
+                }
+            }
+        }
+        return t[size][sum];
+    }
+
+    public int minDifference(int arr[], int n) {
+        int sum = 0;
+        for (int i = 0; i < n; i++) {
+            sum += arr[i];
+        }
+        int size = arr.length;
+        boolean t[][] = new boolean[size + 1][sum + 1];
+        subSetSum(arr, size, sum, t);
+
+        ArrayList<Integer> l = new ArrayList<>();
+        for (int i = 0; i <= sum / 2; i++) {
+            if (t[size][i]) {
+                l.add(i);
+            }
+        }
+
+        int ans = Integer.MAX_VALUE;
+        for (int x : l) {
+            ans = Math.min(ans, sum - 2 * x);
+        }
+
+        return ans;
+    }
+}
+
+q-> count the number of subset in given difference
+
+class Solution {
+    public int perfectSum(int arr[], int n, int sum) {
+        int t[][] = new int[n + 1][sum + 1];
+
+        // Initialize the first column
+        t[0][0] = 1;
+
+        int cnt = 1;
+        int mod = (int)1e9 + 7;
+
+        for (int i = 1; i <= n; i++) {
+            for (int j = 0; j <= sum; j++) {
+                if (j >= arr[i - 1]) {
+                    t[i][j] = (t[i - 1][j - arr[i - 1]] + t[i - 1][j]) % mod;
+                } else {
+                    t[i][j] = t[i - 1][j];
+                }
+            }
+
+            if (arr[i - 1] == 0) {
+                cnt = (cnt * 2) % mod;
+                t[i][0] = cnt;
+            }
+        }
+
+        return t[n][sum];
+}
+ public int countPartitions(int n, int d, int arr[]) {
+        int mod = (int)1e9 + 7;
+        int s = 0;
+        for (int i = 0; i < arr.length; i++) {
+            s += arr[i];
+        }
+
+        if ((d + s) % 2 == 1) {
+            return 0; // If the sum is odd, it's not possible to partition into two subsets with equal sum
+        }
+
+        int sum = (d + s) / 2;
+        return perfectSum(arr, n, sum) % mod;
+    }
+}
+
+
+Q-> target sum
+class Solution {
+      public static  int perfectSum(int arr[], int n, int sum) {
+        int t[][] = new int[n + 1][sum + 1];
+
+        // Initialize the first column
+        t[0][0] = 1;
+
+        int cnt = 1;
+        int mod = (int)1e9 + 7;
+
+        for (int i = 1; i <= n; i++) {
+            for (int j = 0; j <= sum; j++) {
+                if (j >= arr[i - 1]) {
+                    t[i][j] = (t[i - 1][j - arr[i - 1]] + t[i - 1][j]) % mod;
+                } else {
+                    t[i][j] = t[i - 1][j];
+                }
+            }
+
+            if (arr[i - 1] == 0) {
+                cnt = (cnt * 2) % mod;
+                t[i][0] = cnt;
+            }
+        }
+
+        return t[n][sum];
+}
+    static int findTargetSumWays(int[] A , int N, int target) {
+      int mod = (int)1e9 + 7;
+        int s = 0;
+        for (int i = 0; i < A.length; i++) {
+            s += A[i];
+        }
+
+        if ((target+ s) % 2 == 1) {
+            return 0; // If the sum is odd, it's not possible to partition into two subsets with equal sum
+        }
+
+        int sum = (target + s) / 2;
+        return perfectSum(A, N, sum) % mod;
+    }
+};
+
+q-> unbounded knapsack
+
+class Solution{
+    static int knapSack(int N, int W, int val[], int wt[])
+    {
+     int t[][] = new int[N+1][W+1];
+     for(int i = 0;i<N+1;i++){
+         for(int j = 0;j<W+1;j++){
+             if(i == 0 || j ==0){
+                 t[i][j] = 0;
+             }
+             else if(j >= wt[i-1]){
+                 t[i][j] = Math.max(val[i-1]+t[i][j-wt[i-1]],t[i-1][j]);
+             }
+             else{
+                 t[i][j] = t[i-1][j];
+             }
+         }
+     }
+     return t[N][W];
+    }
+}
+
+q-> rod cutting problem
+class Solution {
+    public int cutRod(int price[], int n) {
+        int t[][] = new int[n + 1][n + 1];
+
+        for (int i = 0; i <= n; i++) {
+            for (int j = 0; j <= n; j++) {
+                if (i == 0 || j == 0) {
+                    t[i][j] = 0;
+                } else if (i <= j) {
+                    t[i][j] = Math.max(price[i - 1] + t[i][j - i], t[i - 1][j]);
+                } else {
+                    t[i][j] = t[i - 1][j];
+                }
+            }
+        }
+        return t[n][n];
+    }
+}
+
+q-> coin change1 -> maximum number of ways
+
+
+class Solution {
+    public long solve(int coins[],int N,int sum,long t[][]){
+        //base condition
+        // if(N == 0){
+        //     return 0;
+        // }
+        // if(sum ==0){
+        //  return 1;   
+        // }//initilize in dp
+        for(int j = 0;j<N+1;j++){
+            t[j][0] = 1;
+        }
+        for(int i = 0;i<sum+1;i++){
+            t[0][i] = 0;
+        }
+        // if(t[N][sum] != -1){
+        //     return t[N][sum];
+        // }
+        // else if(sum >= coins[N-1]){
+        //     t[N][sum] = solve(coins,N,sum-coins[N-1],t)+solve(coins,N-1,sum,t);
+        // }
+        // else{
+        //     t[N][sum] = solve(coins,N-1,sum,t);
+        // }
+        for(int i =1 ;i<N+1;i++){
+            for(int j = 1;j<sum+1;j++){
+                if(j>=coins[i-1]){
+                    t[i][j] = t[i][j-coins[i-1]]+t[i-1][j];
+                }
+                else{
+                    t[i][j] = t[i-1][j];
+                }
+            }
+        }
+        return t[N][sum];
+    }
+    public long count(int coins[], int N, int sum) {
+    long t[][] = new long[N+1][sum+1];
+    for(int i = 0;i<N+1;i++){
+        for(int j = 0;j<sum+1;j++){
+            t[i][j] = -1;
+        }
+    }
+    return solve(coins,N,sum,t);
+    }
+}
+q-> longest comman subsequences
+
+class Solution {
+    // Function to find the length of the longest common subsequence in two strings.
+    static int lcs(int x, int y, String s1, String s2) {
+        int t[][] = new int[x + 1][y + 1];
+        
+        for (int i = 0; i < x + 1; i++) {
+            for (int j = 0; j < y + 1; j++) {
+                if (i == 0 || j == 0) {
+                    t[i][j] = 0;
+                } else if (s1.charAt(i - 1) == s2.charAt(j - 1)) {
+                    t[i][j] = 1 + t[i - 1][j - 1];
+                } else {
+                    t[i][j] = Math.max(t[i - 1][j], t[i][j - 1]);
+                }
+            }
+        }
+        return t[x][y];
+    }
+}
+Q-> longest comman substring 
+
+class Solution{
+    int longestCommonSubstr(String S1, String S2, int n, int m){
+    int t[][] = new int[n+1][m+1];
+    int result = 0;
+    for(int i = 0;i<n+1;i++){
+        for(int j = 0;j<m+1;j++){
+            if( i == 0||j ==0){
+                t[i][j] = 0;
+            }
+            else if(S1.charAt(i-1) == S2.charAt(j-1)){
+                t[i][j] = 1+t[i-1][j-1];
+                result = Math.max(result,t[i][j]);
+            }
+            else{
+                t[i][j] = 0;
+            }
+        }
+    }
+    return result;
+    }
+}
+
+q-> combination problem
+
+class Solution {
+    static int nCr(int n, int r) {
+        int t[] = new int[r + 1];
+        if (n < r) return 0;
+        if (n - r < r) r = n - r;
+        int mod = 1000000007;
+        for (int i = 0; i < r + 1; i++) {
+            t[i] = 0;
+        }
+        t[0] = 1;
+        for (int i = 1; i < n + 1; i++) {
+            for (int j = Math.min(r, i); j > 0; j--) {
+                t[j] = (t[j] + t[j - 1]) % mod;
+            }
+        }
+        return t[r];
+    }
+}
+
+Q> permutation
+
+class Solution
+{
+    public int permutationCoeff(int n, int k)
+    {
+        
+         int mod = 1000000007;
+        int permute = 1;
+
+        for (int i = 0; i < k; i++) {
+            permute = (int) ((permute * (long)(n - i)) % mod);
+        }
+
+        return permute;
+        }
+}
+
+
+q->matrix chain multiplication
+
+
+class Solution {
+    static int[][] memo;
+
+    static int solve(int i, int j, int arr[]) {
+        if (i >= j) {
+            return 0;
+        }
+
+        if (memo[i][j] != -1) {
+            return memo[i][j];
+        }
+
+        int minCost = Integer.MAX_VALUE;
+
+        for (int k = i; k <= j - 1; k++) {
+            int temp = solve(i, k, arr) +
+                       solve(k + 1, j, arr) +
+                       // Cost for the current multiplication
+                       arr[i - 1] * arr[k] * arr[j];
+
+            minCost = Math.min(minCost, temp);
+        }
+
+        memo[i][j] = minCost;
+        return minCost;
+    }
+
+    static int matrixMultiplication(int N, int arr[]) {
+        memo = new int[N][N];
+        for (int[] row : memo) {
+            Arrays.fill(row, -1);
+        }
+        return solve(1, N - 1, arr);
+    }
+}
+
+
+Q> edit distance
+
+class Solution {
+    public int solve(String s, String t,int n,int m,int dp[][]){
+      // base case
+        if (n == 0) {
+            return m; // return the remaining characters in t
+        }
+        if (m == 0) {
+            return n; // return the remaining characters in s
+        }
+        if(dp[n][m] != -1){
+            return dp[n][m];
+        }
+        if(s.charAt(n-1) == t.charAt(m-1)){
+            return dp[n][m] = solve(s,t,n-1,m-1,dp);
+        }
+        else{
+            int insert =1+ solve(s,t,n-1,m,dp);
+            int delete =1+ solve(s,t,n,m-1,dp);
+            int replace =1+ solve(s,t,n-1,m-1,dp);
+            return dp[n][m] =  Math.min(insert,Math.min(delete,replace));
+        }
+    }
+    public int editDistance(String s, String t) {
+        
+        int s1 = s.length();
+        int t1 = t.length();
+        int dp[][] = new int[s1+1][t1+1];
+        for(int i =0;i<s1+1;i++){
+            for(int j = 0;j<t1+1;j++){
+                dp[i][j] = -1;
+            }
+        }
+        return solve(s,t,s1,t1,dp);
+    }
+}
+
+Q> friends pairing problem
+class Solution {
+    public long countFriendsPairings(int n) {
+        long mod = 1000000007;
+        if (n == 0 || n == 1 || n == 2) {
+            return n;
+        }
+
+        long[] t = new long[n + 1];
+        t[0] = 0;
+        t[1] = 1;
+        t[2] = 2;
+
+        for (int i = 3; i <= n; i++) {
+            t[i] = (t[i - 1] + (i - 1) * t[i - 2]) % mod;
+        }
+
+        return t[n];
+    }
+}
+
+
+Q> maximum gold contains
+
+//User function Template for Java
+class Solution {
+    static int solve(int row, int col, int M[][], int t[][]) {
+        // base case
+        if (row < 0 || row >= M.length || col < 0 || col >= M[0].length) {
+            return 0;
+        }
+        if (t[row][col] != -1) {
+            return t[row][col];
+        }
+
+        int right = M[row][col] + solve(row, col + 1, M, t);
+        int up = (row - 1 >= 0) ? M[row][col] + solve(row - 1, col + 1, M, t) : 0;
+        int down = (row + 1 < M.length) ? M[row][col] + solve(row + 1, col + 1, M, t) : 0;
+
+        t[row][col] = Math.max(right, Math.max(up, down));
+        return t[row][col];
+    }
+
+    static int maxGold(int n, int m, int M[][]) {
+        int maxGold = 0;
+        int t[][] = new int[n][m];
+        for (int i = 0; i < n; i++) {
+            Arrays.fill(t[i], -1);
+        }
+        for (int i = 0; i < n; i++) {
+            int currentGold = solve(i, 0, M, t);
+            maxGold = Math.max(maxGold, currentGold);
+        }
+        return maxGold;
+    }
+}
+
+Q> maximize cut segments
+
+class Solution {
+    // Function to find the maximum number of cuts.
+    public int maximizeCuts(int n, int x, int y, int z) {
+        int[] dp = new int[n + 1];
+        dp[0] = 0;
+
+        for (int i = 1; i <= n; i++) {
+            dp[i] = -1; // Initialize dp[i] to an invalid state initially
+            if (i - x >= 0) {
+                dp[i] = Math.max(dp[i], dp[i - x]);
+            }
+            if (i - y >= 0) {
+                dp[i] = Math.max(dp[i], dp[i - y]);
+            }
+            if (i - z >= 0) {
+                dp[i] = Math.max(dp[i], dp[i - z]);
+            }
+
+            // If dp[i] is still in an invalid state, it means no valid cut
+            if (dp[i] != -1) {
+                dp[i]++; // Incrementing the count for the valid cut
+            }
+        }
+
+        // dp[n] contains the maximum number of cuts for the given length
+        return Math.max(dp[n], 0);
+    }
+}
+
+Q> longest increasing subsequence
+
+class Solution {
+    public int lcs(int x, int y, String s1, String s2) {
+        int t[][] = new int[x + 1][y + 1];
+
+        for (int i = 0; i < x + 1; i++) {
+            t[i][0] = 0;
+        }
+
+        for (int i = 0; i < y + 1; i++) {
+            t[0][i] = 0;
+        }
+
+        for (int i = 1; i < x + 1; i++) {
+            for (int j = 1; j < y + 1; j++) {
+                if (s1.charAt(i - 1) == s2.charAt(j - 1) && i != j) {
+                    t[i][j] = t[i - 1][j - 1] + 1;
+                } else {
+                    t[i][j] = Math.max(t[i - 1][j], t[i][j - 1]);
+                }
+            }
+        }
+
+        return t[x][y];
+    }
+
+    public int LongestRepeatingSubsequence(String str) {
+        int x = str.length();
+        String str1 = str;
+        int y = str1.length();
+        return lcs(x, y, str, str1);
+    }
+}
+
+Q> LCS of three string 
+
+class Solution 
+{ 
+    int LCSof3(String A, String B, String C, int n1, int n2, int n3) 
+    { 
+        int t[][][] = new int[n1+1][n2+1][n3+1];
+        
+        for(int i = 0; i <= n1; i++){
+            for(int j = 0; j <= n2; j++){
+                for(int k = 0; k <= n3; k++){
+                    if(i == 0 || j == 0 || k == 0){
+                        t[i][j][k] = 0;
+                    }
+                    else if(A.charAt(i-1) == B.charAt(j-1) && A.charAt(i-1) == C.charAt(k-1)){
+                        t[i][j][k] = 1 + t[i-1][j-1][k-1];
+                    }
+                    else{
+                        t[i][j][k] = Math.max(t[i-1][j][k], Math.max(t[i][j-1][k], t[i][j][k-1]));
+                    }
+                }
+            }
+        }
+        return t[n1][n2][n3];
+    }
+}
+
+
+Q> maximum chain length
+
+
+class GfG {
+    int maxChainLength(Pair arr[], int n) {
+        int l = 1;
+
+        // Sorting the array based on the second element of each pair
+        Arrays.sort(arr, new Comparator<Pair>() {
+            public int compare(Pair x, Pair y) {
+                return x.y - y.y;
+            }
+        });
+
+        int s = arr[0].y;
+        for (int i = 1; i < n; i++) {
+            if (arr[i].x > s) {
+                l++;
+                s = arr[i].y;
+            }
+        }
+        return l;
+    }
+}
+
+Q> largest square formed in a matrix with all 1's
+
+class Solution {
+    public static int solve(int n, int m, int mat[][], int[][] memo) {
+        // base condition
+        if (n >= mat.length || m >= mat[0].length) {
+            return 0;
+        }
+
+        if (memo[n][m] != -1) {
+            return memo[n][m];
+        }
+
+        int right = solve(n, m + 1, mat, memo);
+        int down = solve(n + 1, m, mat, memo);
+        int diag = solve(n + 1, m + 1, mat, memo);
+
+        if (mat[n][m] == 1) {
+            int ans = 1 + Math.min(right, Math.min(down, diag));
+            memo[n][m] = ans; // Update memoization array
+            return ans;
+        } else {
+            memo[n][m] = 0;
+            return 0;
+        }
+    }
+
+    static int maxSquare(int n, int m, int mat[][]) {
+        int maxi = 0;
+        int[][] memo = new int[n+1][m+1]; // Memoization array
+for (int i = 0; i < n+1; i++) {
+            for (int j = 0; j < m+1; j++) {
+                memo[i][j] = -1; // Initialize memoization array
+              
+              
+            }
+        }
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                memo[i][j] = -1; // Initialize memoization array
+                maxi = Math.max(maxi, solve(i, j, mat, memo));
+            }
+        }
+        return maxi;
+    }
+}
+
+Q>pair with certain difference
+
+
+class Solution { 
+    public static int  solve(int arr[],int N,int K,int j,int sum){
+        while(j >= 0){
+           if((Math.abs(arr[j]-arr[j+1])) < K){
+               sum+=arr[j];
+               sum +=arr[j+1];
+               j --;
+               j--;
+           } 
+           else{
+               j--;
+           }
+        }
+        return sum;
+    }
+    public static int maxSumPairWithDifferenceLessThanK(int arr[], int N, int K) 
+    {
+        Arrays.sort(arr);
+        int sum = 0;
+        return solve(arr,N,K,N-2,sum);
+    }
+    
+}
+
+Q> consicutive 1's not allowed
+
+
+class Solution {
+    private static final long MOD = 1000000007;
+    private long[] memo;
+
+    long countStrings(int n) {
+        memo = new long[n + 1];
+        return countStringsHelper(n);
+    }
+
+    private long countStringsHelper(int n) {
+        if (n == 1) {
+            return 2;
+        }
+
+        if (memo[n] != 0) {
+            return memo[n];
+        }
+
+        long zero = countStringsHelper(n - 1) % MOD;
+        long one = memo[n - 1] != 0 ? memo[n - 1] : countStringsHelper(n - 2) % MOD;
+
+        memo[n] = (zero + one) % MOD;
+
+        return memo[n];
+    }
+}
+
+
+Q> Maximum difference of zeros and ones in binary string
+
+class Solution {
+    int maxSubstring(String S) {
+        int maxi = 0;
+        int currData = 0;
+        int n = S.length();
+        for(int i = 0;i<n;i++){
+            if(S.charAt(i) == '0'){
+                currData++;
+            }
+            else{
+                currData--;
+            }
+            maxi = Math.max(maxi,currData);
+            if(currData < 0){
+                currData = 0;
+            }
+        }
+        if(maxi == 0){
+            return -1;
+        }
+        return maxi;
+    }
+}
+
+
+
+Q> jump game
+
+class Solution {
+    static int canReach(int[] A, int N) {
+       
+       int maxReach = 0;
+
+        for (int i = 0; i < N; i++) {
+            // If the current index is not reachable, return false
+            if (i > maxReach) {
+                return 0;
+            }
+
+            // Update the maximum reachable index
+            maxReach = Math.max(maxReach, i + A[i]);
+
+            // If the maximum reachable index is beyond or equal to the last index, return true
+            if (maxReach >= N - 1) {
+                return 1;
+            }
+        }
+
+        return 0;
+
+    }
+};
+
